@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zenvy Prime - Watch</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    video {
+      width: 90%;
+      max-width: 960px;
+      border-radius: 12px;
+      border: 5px solid #00f2ff;
+      box-shadow: 0 0 30px #00f2ff;
+    }
+    .error {
+      color: white;
+      font-size: 1.2rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body oncontextmenu="return false">
+
+  <video id="player" controls autoplay controlsList="nodownload" style="display:none;"></video>
+  <div class="error" id="errorMsg" style="display:none;">Access denied. Please buy the movie first.</div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const stream = urlParams.get("stream");
+    const id = urlParams.get("id"); // movie ID like "kesari2"
+
+    const player = document.getElementById("player");
+    const error = document.getElementById("errorMsg");
+
+    if (!stream || !id) {
+      error.innerText = "Invalid movie or link.";
+      error.style.display = "block";
+    } else {
+      const paidKey = "paid_" + id;
+      if (localStorage.getItem(paidKey) === "yes") {
+        player.src = stream;
+        player.style.display = "block";
+      } else {
+        error.style.display = "block";
+      }
+    }
+  </script>
+
+</body>
+</html>

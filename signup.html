@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up - Zenvy Prime</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0; padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      background: linear-gradient(135deg, #0a0a23, #000000);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 50px;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.8);
+      backdrop-filter: blur(10px);
+      position: relative;
+      width: 380px;
+      animation: fadeInUp 1s ease forwards;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, #ff00cc44 10%, transparent 80%);
+      animation: rotateGlow 10s linear infinite;
+      z-index: 0;
+    }
+
+    @keyframes rotateGlow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        transform: translateY(40px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0px);
+        opacity: 1;
+      }
+    }
+
+    .container h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 28px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(to right, #ff00cc, #3333ff);
+      font-weight: 600;
+      font-size: 16px;
+      color: black;
+      cursor: pointer;
+      transition: transform 0.2s;
+      z-index: 1;
+      position: relative;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      z-index: 1;
+      position: relative;
+    }
+
+    .footer a {
+      color: #ff00cc;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Create Your Account</h2>
+    <form id="signup-form">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" required id="email" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" required id="password" />
+      </div>
+      <button type="submit" class="btn">Sign Up</button>
+    </form>
+    <div class="footer">
+      Already have an account? <a href="login.html">Login</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('signup-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      const supabaseClient = supabase.createClient(
+        "https://rufcctboplasewtrukwo.supabase.co", // ← REPLACE THIS
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1ZmNjdGJvcGxhc2V3dHJ1a3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5NjA3NjUsImV4cCI6MjA2NTUzNjc2NX0.aXrfya95Qpcdoru2gNvC6t7BxsbnpfviHTSuMw-QnQg"                    // ← REPLACE THIS
+      );
+
+      const { error, data } = await supabaseClient.auth.signUp({
+        email,
+        password
+      });
+
+      if (error) {
+        alert("Signup failed: " + error.message);
+      } else {
+        alert("Account created! Please check your email to confirm.");
+        location.href = "login.html";
+      }
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</body>
+</html>
