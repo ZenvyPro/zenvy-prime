@@ -173,10 +173,10 @@
     const email = user?.email;
 
     movies.forEach(m => {
+      const isPaid = localStorage.getItem("paid_" + m.id) === "yes" || paidEmails.includes(email);
+
       const card = document.createElement("div");
       card.className = "movie-card";
-
-      const isPaid = localStorage.getItem("paid_" + m.id) === "yes" || paidEmails.includes(email);
 
       card.innerHTML = `
         <img src="${m.thumb}" alt="${m.title}">
