@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Zenvy Prime - Watch</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <style>
     body {
@@ -31,7 +31,7 @@
 <body oncontextmenu="return false">
 
   <video id="player" controls autoplay controlsList="nodownload" style="display:none;"></video>
-  <div class="error" id="errorMsg" style="display:none;">Access denied. Please buy the movie first.</div>
+  <div class="error" id="errorMsg" style="display:none;">Access denied or invalid link.</div>
 
   <script>
     const supabase = window.supabase.createClient(
@@ -39,36 +39,33 @@
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1ZmNjdGJvcGxhc2V3dHJ1a3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5NjA3NjUsImV4cCI6MjA2NTUzNjc2NX0.aXrfya95Qpcdoru2gNvC6t7BxsbnpfviHTSuMw-QnQg"
     );
 
-    const allowedEmails = ["sagar00xm@gmail.com"]; // ✅ Add your allowed emails here
+    const allowedEmails = ["zenvyprime@gmail.com", "admin@yourdomain.com"];
 
     const urlParams = new URLSearchParams(window.location.search);
-    const stream = urlParams.get("https://pixeldrain.com/api/file/TZQhs75X?stream=true");
-    const id = urlParams.get("kesari2"); // e.g., "kesari2"
-
+    const stream = urlParams.get("stream");
+    const movieId = urlParams.get("id");
     const player = document.getElementById("player");
     const error = document.getElementById("errorMsg");
 
     async function checkAccess() {
-      if (!stream || !id) {
+      if (!stream || !movieId) {
         error.innerText = "Invalid movie link.";
         error.style.display = "block";
         return;
       }
 
-      const paidKey = "paid_" + id;
-
-      // check local device
+      const paidKey = "paid_" + movieId;
       const hasLocalAccess = localStorage.getItem(paidKey) === "yes";
 
-      // check email
       const { data: { user } } = await supabase.auth.getUser();
       const email = user?.email;
+      const isAllowed = allowedEmails.includes(email);
 
-      if (hasLocalAccess || allowedEmails.includes(email)) {
+      if (hasLocalAccess || isAllowed) {
         player.src = stream;
         player.style.display = "block";
       } else {
-        error.innerText = "Access denied. Please buy the movie first.";
+        error.innerText = "Access denied. Please pay to watch this movie.";
         error.style.display = "block";
       }
     }
