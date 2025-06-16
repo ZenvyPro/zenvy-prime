@@ -154,7 +154,6 @@
     }
   ];
 
-  // ✅ Emails that already paid
   const paidEmails = ["sagar00xm@gmail.com"];
 
   function logout() {
@@ -166,17 +165,28 @@
     if (!user) window.location.href = "login.html";
   }
 
-  function loadMovies() {
+  async function loadMovies() {
     const container = document.getElementById("movie-carousel");
     container.innerHTML = "";
+
+    const { data: { user } } = await supabase.auth.getUser();
+    const email = user?.email;
+
     movies.forEach(m => {
       const card = document.createElement("div");
       card.className = "movie-card";
+
+      const isPaid = localStorage.getItem("paid_" + m.id) === "yes" || paidEmails.includes(email);
+
       card.innerHTML = `
         <img src="${m.thumb}" alt="${m.title}">
         <div class="movie-actions">
-          <button onclick="buyMovie('${m.id}', ${m.price}, '${m.stream}')">Watch ₹${m.price}</button>
-        </div>`;
+          <button onclick="buyMovie('${m.id}', ${m.price}, '${m.stream}')">
+            ${isPaid ? "Watch Now" : "Watch ₹" + m.price}
+          </button>
+        </div>
+      `;
+
       container.appendChild(card);
     });
   }
