@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Zenvy Prime</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
     body {
@@ -30,31 +30,13 @@
       font-weight: bold;
     }
 
-    .nav-links {
-      display: flex;
-      gap: 20px;
-      margin-top: 10px;
-      flex-wrap: wrap;
-    }
-
-    .nav-links a {
-      color: white;
-      text-decoration: none;
-      font-weight: 600;
-      transition: color 0.3s;
-    }
-
-    .nav-links a:hover {
-      color: #00f2ff;
-    }
-
     .search-bar {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-top: 10px;
       width: 100%;
       justify-content: flex-end;
+      margin-top: 10px;
     }
 
     .search-bar input {
@@ -125,7 +107,7 @@
       padding: 10px;
       background: rgba(0,0,0,0.6);
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
     }
 
     .movie-actions button {
@@ -148,10 +130,6 @@
     <input type="text" id="searchInput" placeholder="Search movies..." oninput="filterMovies()">
     <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
-  <nav class="nav-links">
-    <a href="index.html">Home</a>
-    <a href="movies.html">Movies</a>
-  </nav>
 </header>
 
 <section>
@@ -161,81 +139,77 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script>
-const supabase = window.supabase.createClient(
-  "https://rufcctboplasewtrukwo.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1ZmNjdGJvcGxhc2V3dHJ1a3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5NjA3NjUsImV4cCI6MjA2NTUzNjc2NX0.aXrfya95Qpcdoru2gNvC6t7BxsbnpfviHTSuMw-QnQg"
-);
+  const supabase = window.supabase.createClient(
+    "https://rufcctboplasewtrukwo.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1ZmNjdGJvcGxhc2V3dHJ1a3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5NjA3NjUsImV4cCI6MjA2NTUzNjc2NX0.aXrfya95Qpcdoru2gNvC6t7BxsbnpfviHTSuMw-QnQg"
+  );
 
-const movies = [
-  {
-    id: "kesari2",
-    title: "Kesari Chapter 2",
-    thumb: "thum.png",
-    price: 40,
-    stream: "https://pixeldrain.com/api/file/TZQhs75X?stream=true"
+  const movies = [
+    {
+      id: "kesari2",
+      title: "Kesari Chapter 2",
+      thumb: "thum.png",
+      price: 40,
+      stream: "https://pixeldrain.com/api/file/TZQhs75X?stream=true"
+    }
+  ];
+
+  // ✅ Emails that already paid
+  const paidEmails = ["sagar00xm@gmail.com"];
+
+  function logout() {
+    supabase.auth.signOut().then(() => window.location.href = "login.html");
   }
-];
 
-function logout() {
-  supabase.auth.signOut().then(() => window.location.href = "login.html");
-}
+  async function checkLogin() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) window.location.href = "login.html";
+  }
 
-async function checkLogin() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) window.location.href = "login.html";
-}
+  function loadMovies() {
+    const container = document.getElementById("movie-carousel");
+    container.innerHTML = "";
+    movies.forEach(m => {
+      const card = document.createElement("div");
+      card.className = "movie-card";
+      card.innerHTML = `
+        <img src="${m.thumb}" alt="${m.title}">
+        <div class="movie-actions">
+          <button onclick="buyMovie('${m.id}', ${m.price}, '${m.stream}')">Watch ₹${m.price}</button>
+        </div>`;
+      container.appendChild(card);
+    });
+  }
 
-function loadMovies() {
-  const container = document.getElementById("movie-carousel");
-  container.innerHTML = "";
-  movies.forEach(m => {
-    const card = document.createElement("div");
-    card.className = "movie-card";
-    card.innerHTML = `
-      <img src="${m.thumb}" alt="${m.title}">
-      <div class="movie-actions">
-        <button onclick="buyMovie('${m.id}', ${m.price}, '${m.stream}')">Watch ₹${m.price}</button>
-        <button onclick="addToWatchlist('${m.id}')">+ Watchlist</button>
-      </div>`;
-    container.appendChild(card);
-  });
-}
+  async function buyMovie(id, price, streamUrl) {
+    const key = "paid_" + id;
+    const { data: { user } } = await supabase.auth.getUser();
+    const email = user?.email;
 
-function buyMovie(id, price, streamUrl) {
-  const key = "paid_" + id;
-  if (localStorage.getItem(key) === "yes") {
-    window.location.href = `watch.html?stream=${encodeURIComponent(streamUrl)}`;
-  } else {
-    if (confirm(`Pay ₹${price} to watch?`)) {
-      window.open("https://rzp.io/rzp/bBqZBYIc");
-      setTimeout(() => {
-        localStorage.setItem(key, "yes");
-        alert("Payment detected!");
-        window.location.href = `watch.html?stream=${encodeURIComponent(streamUrl)}`;
-      }, 10000);
+    if (localStorage.getItem(key) === "yes" || paidEmails.includes(email)) {
+      window.location.href = `watch.html?stream=${encodeURIComponent(streamUrl)}&id=${id}`;
+    } else {
+      if (confirm(`Pay ₹${price} to watch?`)) {
+        window.open("https://rzp.io/rzp/bBqZBYIc");
+        setTimeout(() => {
+          localStorage.setItem(key, "yes");
+          alert("Payment detected!");
+          window.location.href = `watch.html?stream=${encodeURIComponent(streamUrl)}&id=${id}`;
+        }, 10000);
+      }
     }
   }
-}
 
-function addToWatchlist(id) {
-  let list = JSON.parse(localStorage.getItem("watchlist") || "[]");
-  if (!list.includes(id)) {
-    list.push(id);
-    localStorage.setItem("watchlist", JSON.stringify(list));
-    alert("Added to watchlist!");
+  function filterMovies() {
+    const term = document.getElementById("searchInput").value.toLowerCase();
+    document.querySelectorAll(".movie-card").forEach(card => {
+      const match = card.innerHTML.toLowerCase().includes(term);
+      card.style.display = match ? "block" : "none";
+    });
   }
-}
 
-function filterMovies() {
-  const term = document.getElementById("searchInput").value.toLowerCase();
-  document.querySelectorAll(".movie-card").forEach(card => {
-    const match = card.innerHTML.toLowerCase().includes(term);
-    card.style.display = match ? "block" : "none";
-  });
-}
-
-checkLogin();
-loadMovies();
+  checkLogin();
+  loadMovies();
 </script>
 
 </body>
