@@ -30,7 +30,10 @@
 </head>
 <body oncontextmenu="return false">
 
-  <video id="player" controls autoplay controlsList="nodownload" style="display:none;"></video>
+  <video id="player" controls autoplay controlsList="nodownload" style="display:none;">
+    <source id="videoSource" src="" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
   <div class="error" id="errorMsg" style="display:none;">Access denied or invalid link.</div>
 
   <script>
@@ -39,13 +42,13 @@
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1ZmNjdGJvcGxhc2V3dHJ1a3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5NjA3NjUsImV4cCI6MjA2NTUzNjc2NX0.aXrfya95Qpcdoru2gNvC6t7BxsbnpfviHTSuMw-QnQg"
     );
 
-    const allowedEmails = ["zenvyprime@gmail.com", "admin@yourdomain.com"];
-
+    const allowedEmails = ["sagar00xm@gmail.com", "admin@yourdomain.com"];
     const urlParams = new URLSearchParams(window.location.search);
     const stream = urlParams.get("stream");
     const movieId = urlParams.get("id");
 
     const player = document.getElementById("player");
+    const source = document.getElementById("videoSource");
     const error = document.getElementById("errorMsg");
 
     async function checkAccess() {
@@ -63,10 +66,11 @@
       const isAllowed = allowedEmails.includes(email);
 
       if (hasLocalAccess || isAllowed) {
-        player.src = stream;
+        source.src = stream;
+        player.load();
         player.style.display = "block";
       } else {
-        error.innerText = "Access denied. Please pay to unlock this movie.";
+        error.innerText = "Access denied. Please pay to watch this movie.";
         error.style.display = "block";
       }
     }
