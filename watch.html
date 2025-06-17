@@ -46,6 +46,11 @@
     const paidKey = "paid_" + movieId;
     const allowedEmails = ["sagar00xm@gmail.com"];
 
+    const streamUrl = "https://pixeldrain.com/api/file/2p3GbH4G?stream=true";
+    const movieId = "babyjonh";
+    const paidKey = "paid_" + movieId;
+    const allowedEmails = ["sagar00xm@gmail.com"];
+
     async function checkAccessAndPlay() {
       const { data: { user } } = await supabase.auth.getUser();
       const email = user?.email;
