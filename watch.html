@@ -41,22 +41,47 @@
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1ZmNjdGJvcGxhc2V3dHJ1a3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5NjA3NjUsImV4cCI6MjA2NTUzNjc2NX0.aXrfya95Qpcdoru2gNvC6t7BxsbnpfviHTSuMw-QnQg"
     );
 
-    const streamUrl = "https://pixeldrain.com/api/file/TZQhs75X?stream=true";
-    const movieId = "kesari2";
-    const paidKey = "paid_" + movieId;
+    const movies = [
+      {
+        id: "kesari2",
+        title: "Kesari Chapter 2",
+        stream: "https://pixeldrain.com/api/file/TZQhs75X?stream=true"
+      },
+      {
+        id: "babyjonh",
+        title: "Baby John",
+        stream: "https://pixeldrain.com/api/file/2p3GbH4G?stream=true"
+      }
+    ];
+
     const allowedEmails = ["sagar00xm@gmail.com"];
 
+    function getQueryParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
     async function checkAccessAndPlay() {
+      const movieId = getQueryParam("id");
+      const movie = movies.find(m => m.id === movieId);
+
+      if (!movie) {
+        document.getElementById("errorMsg").textContent = "Movie not found.";
+        document.getElementById("errorMsg").style.display = "block";
+        return;
+      }
+
+      const paidKey = "paid_" + movieId;
       const { data: { user } } = await supabase.auth.getUser();
       const email = user?.email;
       const isPaid = localStorage.getItem(paidKey) === "yes" || allowedEmails.includes(email);
 
       if (isPaid) {
         const video = document.getElementById("player");
-        document.getElementById("videoSource").src = streamUrl;
+        document.getElementById("videoSource").src = movie.stream;
         video.load();
         video.style.display = "block";
       } else {
+        document.getElementById("errorMsg").textContent = "Access denied. Please purchase to watch.";
         document.getElementById("errorMsg").style.display = "block";
       }
     }
