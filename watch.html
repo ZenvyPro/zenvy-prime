@@ -54,7 +54,7 @@
       }
     ];
 
-    const allowedEmails = ["sagar00xm@gmail.com"];
+    const allowedEmails = ["sagar00xm@gmail.com"]; // Emails with free access
 
     function getQueryParam(name) {
       return new URLSearchParams(window.location.search).get(name);
@@ -63,6 +63,7 @@
     async function checkAccessAndPlay() {
       const movieId = getQueryParam("id");
       const movie = movies.find(m => m.id === movieId);
+      const paidKey = "paid_" + movieId;
 
       if (!movie) {
         document.getElementById("errorMsg").textContent = "Movie not found.";
@@ -70,14 +71,14 @@
         return;
       }
 
-      const paidKey = "paid_" + movieId;
       const { data: { user } } = await supabase.auth.getUser();
-      const email = user?.email;
+      const email = user?.email || "";
       const isPaid = localStorage.getItem(paidKey) === "yes" || allowedEmails.includes(email);
 
       if (isPaid) {
         const video = document.getElementById("player");
-        document.getElementById("videoSource").src = movie.stream;
+        const source = document.getElementById("videoSource");
+        source.src = movie.stream;
         video.load();
         video.style.display = "block";
       } else {
